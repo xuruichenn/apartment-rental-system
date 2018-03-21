@@ -19,8 +19,18 @@ elasticsearch.createIndex('items');
 
 // The 5 endpoints are defined below
 
+/*
+AD HOC Documentation:
+V2 - Changed the elastic endpoint method. Instead of recursive calls, the bulk of the work is shifted to the node server.
+V2.2 - Changed the iterations of randomly genereated names (within elastic endpoint) from 10 to 20
+V2.3 - Changed the iterations of randomly generated names (within elastic endpoint) from 20 to 50
+V3 - Changed the elastic endpoint implementation. Modified the method calls to balance out the work between the elastic and node.
+V3.1 - Added more randomly generated names within the elastic endpoint (from 1 to 3 calls)
+V3.2 - Added more randomly generated names within the elastic endpoint (from 3 to 9 calls)
+*/
+
 app.get('/app/users', function(req, res) {
-    res.send('Welcome to the multiservice application V2!');
+    res.send('Welcome to the multiservice application V3.2!');
 });
 
 app.get('/app/psql/users', function(req, res, next) {
@@ -129,6 +139,8 @@ app.delete('/app/mysql/users', function(req, res, next) {
 //     })
 // }
 
+
+// V1
 var continueElasticGet = function(req, res, name) {
     var count = req.params.count;
     // Generating unused random name
@@ -148,6 +160,7 @@ var continueElasticGet = function(req, res, name) {
     });
 }
 
+/* V2 */
 // app.get('/app/elastic/users/:count', function(req, res, next) {
 //     var count = req.params.count;
 //     count1 = 0;
@@ -163,6 +176,30 @@ var continueElasticGet = function(req, res, name) {
 //     });
 // });
 
+
+/* V2 */
+// app.get('/app/elastic/users/:count', function(req, res, next) {
+//     var count = req.params.count;
+//     name = Math.random().toString(36).substring(7);
+//     console.log(name);
+//     var iterations = 0;
+//     while (iterations < count) {
+//         postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
+//         {
+//             elasticsearch.search('items', name).then(function(result) {
+//                 // Pass
+//             });
+//             var i;
+//             for (i = 0; i < 50; i++) {
+//                 uname = Math.random().toString(36).substring(7);
+//             }
+//         });
+//         iterations = iterations + 1;
+//     }
+//     res.json(res);
+// });
+
+/* V3 */
 app.get('/app/elastic/users/:count', function(req, res, next) {
     var count = req.params.count;
     name = Math.random().toString(36).substring(7);
@@ -171,12 +208,19 @@ app.get('/app/elastic/users/:count', function(req, res, next) {
     while (iterations < count) {
         postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
         {
-            elasticsearch.search('items', name).then(function(result) {
-                // Pass
-            });
             var i;
-            for (i = 0; i < 10; i++) {
-                uname = Math.random().toString(36).substring(7);
+            for (i = 0; i < 50; i++) {
+                elasticsearch.search('items', name).then(function(result) {
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                    uname = Math.random().toString(36).substring(7);
+                });
             }
         });
         iterations = iterations + 1;
