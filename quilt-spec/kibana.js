@@ -15,6 +15,10 @@ Kibana.prototype.deploy = function deploy(depl) {
   depl.deploy(this.container);
 };
 
+Kibana.prototype.placeOn = function placeOn(disk) {
+	this.container.placeOn(disk);
+}
+
 Kibana.prototype.port = 5601;
 
 exports.Kibana = Kibana;
