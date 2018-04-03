@@ -24,13 +24,16 @@ AD HOC Documentation:
 V2 - Changed the elastic endpoint method. Instead of recursive calls, the bulk of the work is shifted to the node server.
 V2.2 - Changed the iterations of randomly genereated names (within elastic endpoint) from 10 to 20
 V2.3 - Changed the iterations of randomly generated names (within elastic endpoint) from 20 to 50
+V2.4 - Increased CPU loads of the generation of the random strings (within elastic endpoint)
 V3 - Changed the elastic endpoint implementation. Modified the method calls to balance out the work between the elastic and node.
 V3.1 - Added more randomly generated names within the elastic endpoint (from 1 to 3 calls)
 V3.2 - Added more randomly generated names within the elastic endpoint (from 3 to 9 calls)
+V4 - Changed elastic endpoint method. Modified method calls to increase CPU loads with large integer multiplication.
+V4.1 - Increased limit size to 1,000,000,000
 */
 
 app.get('/app/users', function(req, res) {
-    res.send('Welcome to the multiservice application V3.2!');
+    res.send('Welcome to the multiservice application V4.1!');
 });
 
 app.get('/app/psql/users', function(req, res, next) {
@@ -141,24 +144,24 @@ app.delete('/app/mysql/users', function(req, res, next) {
 
 
 // V1
-var continueElasticGet = function(req, res, name) {
-    var count = req.params.count;
-    // Generating unused random name
-    uname = Math.random().toString(36).substring(7);
-    const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
-    count1 += 1;
-    query.on('end', () => {
-        elasticsearch.search('items', name).then(function(result) {
-            console.log(result.hits.total);
-            if (result.hits.total < parseInt(count)) {
-                continueElasticGet(req, res, name);
-            } else {
-                console.log("END" + count1.toString());
-                res.json(result);
-            }
-        });
-    });
-}
+// var continueElasticGet = function(req, res, name) {
+//     var count = req.params.count;
+//     // Generating unused random name
+//     uname = Math.random().toString(36).substring(7);
+//     const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
+//     count1 += 1;
+//     query.on('end', () => {
+//         elasticsearch.search('items', name).then(function(result) {
+//             console.log(result.hits.total);
+//             if (result.hits.total < parseInt(count)) {
+//                 continueElasticGet(req, res, name);
+//             } else {
+//                 console.log("END" + count1.toString());
+//                 res.json(result);
+//             }
+//         });
+//     });
+// }
 
 /* V2 */
 // app.get('/app/elastic/users/:count', function(req, res, next) {
@@ -177,7 +180,7 @@ var continueElasticGet = function(req, res, name) {
 // });
 
 
-/* V2 */
+// /* V2 */
 // app.get('/app/elastic/users/:count', function(req, res, next) {
 //     var count = req.params.count;
 //     name = Math.random().toString(36).substring(7);
@@ -191,7 +194,7 @@ var continueElasticGet = function(req, res, name) {
 //             });
 //             var i;
 //             for (i = 0; i < 50; i++) {
-//                 uname = Math.random().toString(36).substring(7);
+//                 uname = Math.random().toString(1000).substring(800);
 //             }
 //         });
 //         iterations = iterations + 1;
@@ -200,6 +203,35 @@ var continueElasticGet = function(req, res, name) {
 // });
 
 /* V3 */
+// app.get('/app/elastic/users/:count', function(req, res, next) {
+//     var count = req.params.count;
+//     name = Math.random().toString(36).substring(7);
+//     console.log(name);
+//     var iterations = 0;
+//     while (iterations < count) {
+//         postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
+//         {
+//             var i;
+//             for (i = 0; i < 50; i++) {
+//                 elasticsearch.search('items', name).then(function(result) {
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                     uname = Math.random().toString(36).substring(7);
+//                 });
+//             }
+//         });
+//         iterations = iterations + 1;
+//     }
+//     res.json(res);
+// });
+
+/* V4 */
 app.get('/app/elastic/users/:count', function(req, res, next) {
     var count = req.params.count;
     name = Math.random().toString(36).substring(7);
@@ -208,19 +240,15 @@ app.get('/app/elastic/users/:count', function(req, res, next) {
     while (iterations < count) {
         postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
         {
-            var i;
-            for (i = 0; i < 50; i++) {
-                elasticsearch.search('items', name).then(function(result) {
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                    uname = Math.random().toString(36).substring(7);
-                });
+            elasticsearch.search('items', name).then(function(result) {
+                // Pass
+            });
+            var i = 1;
+            var limit = parseInt(Math.random()*1000000000, 10);
+            var count = 1;
+            for (; i < limit; i++) {
+                count = count * i;
+                uname = Math.random().toString(1000000).substring(800000);
             }
         });
         iterations = iterations + 1;
