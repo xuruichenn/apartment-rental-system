@@ -69,7 +69,8 @@ function nodeServer(count, nodeRepo) {
     this.mysql.allowFrom(spark.workers, 3306);
 
     this.machPlacements = function machPlacements(diskSizes) {
-        // First Machine
+        /*** Dedicated Spark Machine (avoids noisy neighbor - see below )***/
+        // ELK on one machine
         this.elastic.placeOn({diskSize: diskSizes[0]});
         this.logstash.placeOn({diskSize: diskSizes[0]});
         this.kib.placeOn({diskSize: diskSizes[0]});
@@ -77,17 +78,36 @@ function nodeServer(count, nodeRepo) {
         // Second Machine
         this.app[0].placeOn({diskSize: diskSizes[1]});
         this.proxy.placeOn({diskSize: diskSizes[1]});
+        this.postgres.placeOn({diskSize: diskSizes[1]});
 
         // Third Machine
         this.app[1].placeOn({diskSize: diskSizes[2]});
         this.mysql.placeOn({diskSize: diskSizes[2]});
+        this.app[2].placeOn({diskSize: diskSizes[2]});
 
-        // Fourth Machine
-        this.app[2].placeOn({diskSize: diskSizes[3]});
-        this.postgres.placeOn({diskSize: diskSizes[3]});
+        // Fourth Machine (Dedicated Spark)
+        this.spark.placeOn([diskSizes[3], diskSizes[3], diskSizes[3]]);
 
-        // Separate function for spark
-        this.spark.placeOn([diskSizes[1], diskSizes[2], diskSizes[3]]);
+        /*** Evenly placed (possible noisy neighbor SPARK for CPU-QUOTA) ***/
+        // // First Machine
+        // this.elastic.placeOn({diskSize: diskSizes[0]});
+        // this.logstash.placeOn({diskSize: diskSizes[0]});
+        // this.kib.placeOn({diskSize: diskSizes[0]});
+
+        // // Second Machine
+        // this.app[0].placeOn({diskSize: diskSizes[1]});
+        // this.proxy.placeOn({diskSize: diskSizes[1]});
+
+        // // Third Machine
+        // this.app[1].placeOn({diskSize: diskSizes[2]});
+        // this.mysql.placeOn({diskSize: diskSizes[2]});
+
+        // // Fourth Machine
+        // this.app[2].placeOn({diskSize: diskSizes[3]});
+        // this.postgres.placeOn({diskSize: diskSizes[3]});
+
+        // // Separate function for spark
+        // this.spark.placeOn([diskSizes[1], diskSizes[2], diskSizes[3]]);
     };
 
     this.deploy = function deploy(deployment) {
