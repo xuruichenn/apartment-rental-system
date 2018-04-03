@@ -8,7 +8,7 @@ var cmd = "spark-submit --master spark://spark-ms.q:7077 --py-files helper_funct
 
 var nWorker = 2;
 
-var config = {'executor_mem': '25g', 'worker_mem': '30g', 'executor_cores': '4'}
+var config = {'executor_mem': '25g', 'worker_mem': '30g', 'executor_cores': '2'}
 
 var sprk = new spark.Spark(1, nWorker)
     .exposeUIToPublic()

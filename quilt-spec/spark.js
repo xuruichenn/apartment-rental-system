@@ -66,15 +66,30 @@ function Spark(nMaster, nWorker, zookeeper) {
   allow(this.masters, this.workers, new Range(0, 65000));
   allow(this.masters, this.masters, new Range(0, 65000));
 
-  cont = this.workers;
-  allow(cont, publicInternet, 80);
-  allow(cont, publicInternet, 53);
-  allow(cont, publicInternet, 443);
-  allow(cont, publicInternet, 5000);
-  allow(publicInternet, cont, 80);
-  allow(publicInternet, cont, 53);
-  allow(publicInternet, cont, 443);
-  allow(publicInternet, cont, 5000);
+  // Flexible for workers on the same machine 
+  // WARNING: does not account for other service ports!
+  var count = 0;
+  for (; count < nWorker; count ++) {
+    allow(this.workers[count], publicInternet, 80 + count);
+    allow(this.workers[count], publicInternet, 53 + count);
+    allow(this.workers[count], publicInternet, 443 + count);
+    allow(this.workers[count], publicInternet, 5000 + count);
+    allow(publicInternet, this.workers[count], 80 + count);
+    allow(publicInternet, this.workers[count], 53 + count);
+    allow(publicInternet, this.workers[count], 443 + count);
+    allow(publicInternet, this.workers[count], 5000 + count);
+  }
+
+  // If workers are not on the same machine
+  // cont = this.workers;
+  // allow(cont, publicInternet, 80);
+  // allow(cont, publicInternet, 53);
+  // allow(cont, publicInternet, 443);
+  // allow(cont, publicInternet, 5000);
+  // allow(publicInternet, cont, 80);
+  // allow(publicInternet, cont, 53);
+  // allow(publicInternet, cont, 443);
+  // allow(publicInternet, cont, 5000);
 
   if (zookeeper) {
     allow(this.masters, zookeeper, 2181);
@@ -106,7 +121,8 @@ function Spark(nMaster, nWorker, zookeeper) {
 
   this.exposeUIToPublic = function exposeUIToPublic() {
     allow(publicInternet, this.masters, 8080);
-    allow(publicInternet, this.workers, 8081);
+    allow(publicInternet, this.workers[0], 8081);
+    allow(publicInternet, this.workers[1], 8082);
     return this;
   };
 
