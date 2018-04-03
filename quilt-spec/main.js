@@ -32,9 +32,9 @@ var machine3 = new quilt.Machine({
 
 var machine4 = new quilt.Machine({
     provider: "Amazon",
-    size: "m4.large",
+    size: "m4.xlarge",
     sshKeys: quilt.githubKeys('TsaiAnson'),
-    diskSize: 18,
+    diskSize: 32,
 });
 
 var countNode = 3;
@@ -48,6 +48,6 @@ deployment.deploy(machine3.asWorker());
 deployment.deploy(machine4.asWorker());
 
 // Needs to be four machines! (Temporary)
-apartmentApp.machPlacements([15, 16, 17, 18]);
+apartmentApp.machPlacements([15, 16, 17, 32]);
 
 deployment.deploy(apartmentApp);
