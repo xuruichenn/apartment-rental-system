@@ -30,10 +30,13 @@ V3.1 - Added more randomly generated names within the elastic endpoint (from 1 t
 V3.2 - Added more randomly generated names within the elastic endpoint (from 3 to 9 calls)
 V4 - Changed elastic endpoint method. Modified method calls to increase CPU loads with large integer multiplication.
 V4.1 - Increased limit size to 1,000,000,000
+V4.2 - Increased limit size to 1,000,000,000,000
+V4.3 - Modified method to be less predictable
+V5 - Modified function to remove asynchronous calls
 */
 
 app.get('/app/users', function(req, res) {
-    res.send('Welcome to the multiservice application V4.1!');
+    res.send('Welcome to the multiservice application V5!');
 });
 
 app.get('/app/psql/users', function(req, res, next) {
@@ -232,28 +235,66 @@ app.delete('/app/mysql/users', function(req, res, next) {
 // });
 
 /* V4 */
+// app.get('/app/elastic/users/:count', function(req, res, next) {
+//     var count = req.params.count;
+//     var name = Math.random().toString(36).substring(7);
+//     console.log(name);
+//     var iterations = 0;
+//     while (iterations < count) {
+//         postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
+//         {
+//             elasticsearch.search('items', name).then(function(result) {
+//                 // Pass
+//             });
+//             var i = 1;
+//             var limit = parseInt(Math.random()*1000000000000, 13);
+//             var count1 = 1;
+//             var rand1;
+//             var rand2;
+//             var rand3;
+//             var uname;
+//             for (; i < limit; i++) {
+//                 rand1 = parseInt(Math.random()*1000000000000, 13);
+//                 rand2 = parseInt(Math.random()*1000000000000, 13);
+//                 rand3 = rand1 * rand2;
+//                 uname = Math.random().toString(1000000).substring(800000);
+//             }
+//         });
+//         iterations = iterations + 1;
+//     }
+//     res.json(iterations);
+// });
+
+/* V5 */
 app.get('/app/elastic/users/:count', function(req, res, next) {
     var count = req.params.count;
-    name = Math.random().toString(36).substring(7);
+    var name = Math.random().toString(36).substring(7);
     console.log(name);
-    var iterations = 0;
-    while (iterations < count) {
-        postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
-        {
-            elasticsearch.search('items', name).then(function(result) {
-                // Pass
-            });
-            var i = 1;
-            var limit = parseInt(Math.random()*1000000000, 10);
-            var count = 1;
-            for (; i < limit; i++) {
-                count = count * i;
-                uname = Math.random().toString(1000000).substring(800000);
-            }
+    postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
+    {
+        elasticsearch.search('items', name).then(function(result) {
+            //Pass
+            console.log("finished search");
         });
-        iterations = iterations + 1;
+    });
+
+    var rand1;
+    var rand2;
+    var rand3;
+    var uname;
+    var ticks = 0;
+    var limit = 1000000;
+    for (var j = 0; j < count; j++) {
+        for (var i = 0; i < limit; i++) {
+            rand1 = parseInt(Math.random()*1000000, 7);
+            rand2 = parseInt(Math.random()*1000000, 7);
+            rand3 = rand1 * rand2;
+            uname = Math.random().toString(36).substring(800000);
+            ticks++;
+        }
     }
-    res.json(res);
+    console.log(ticks);
+    res.json(ticks);
 });
 
 app.get('/app/elastic/count/:word', function(req, res, next) {
@@ -276,6 +317,7 @@ app.get('/app/elastic/reset', function(req, res, next) {
     elasticsearch.deleteIndex('items');
     elasticsearch.createIndex('items');
 });
+
 
 app.listen(PORT_NUMBER);
 // console.log('Navigate to http://localhost:3000/app/users');
