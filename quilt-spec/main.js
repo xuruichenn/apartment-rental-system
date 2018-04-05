@@ -1,7 +1,7 @@
 const quilt = require('@quilt/quilt');
 const nodeServer = require('./nodeServer');
 
-const deployment = quilt.createDeployment({namespace: "tsaianson-aptapp", adminACL: ['0.0.0.0/0']});
+const deployment = quilt.createDeployment({namespace: "TEMP-NAMESPACE", adminACL: ['0.0.0.0/0']});
 
 var machine0 = new quilt.Machine({
     provider: "Amazon",
