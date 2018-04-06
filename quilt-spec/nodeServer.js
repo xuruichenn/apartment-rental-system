@@ -13,6 +13,9 @@ function nodeServer(count, nodeRepo) {
     this.logstash = new Container('logstash', 'hantaowang/logstash-postgres');
 
     this.kib = new Kibana(this.elastic);
+    this.kib1 = new Kibana(this.elastic);
+    this.kib2 = new Kibana(this.elastic);
+    this.kib3 = new Kibana(this.elastic);
 
     this.spark = spark;
 
@@ -70,9 +73,8 @@ function nodeServer(count, nodeRepo) {
 
     this.machPlacements = function machPlacements(diskSizes) {
         /*** Dedicated Spark Machine (avoids noisy neighbor - see below )***/
-        // ELK on one machine
+        // First machine
         this.elastic.placeOn({diskSize: diskSizes[0]});
-        this.logstash.placeOn({diskSize: diskSizes[0]});
         this.kib.placeOn({diskSize: diskSizes[0]});
 
         // Second Machine
@@ -82,11 +84,20 @@ function nodeServer(count, nodeRepo) {
 
         // Third Machine
         this.app[1].placeOn({diskSize: diskSizes[2]});
-        this.mysql.placeOn({diskSize: diskSizes[2]});
         this.app[2].placeOn({diskSize: diskSizes[2]});
+        this.kib1.placeOn({diskSize: diskSizes[2]});
 
-        // Fourth Machine (Dedicated Spark)
-        this.spark.placeOn([diskSizes[3], diskSizes[3], diskSizes[3]]);
+        // Fourth Machine
+        this.mysql.placeOn({diskSize: diskSizes[3]});
+        this.kib2.placeOn({diskSize: diskSizes[3]});
+
+        // Fifth Machine
+        this.logstash.placeOn({diskSize: diskSizes[4]});
+        this.kib3.placeOn({diskSize: diskSizes[4]});
+
+
+        // Sixth Machine (Dedicated Spark)
+        this.spark.placeOn([diskSizes[5], diskSizes[5], diskSizes[5]]);
 
         /*** Evenly placed (possible noisy neighbor SPARK for CPU-QUOTA) ***/
         // // First Machine
@@ -111,7 +122,7 @@ function nodeServer(count, nodeRepo) {
     };
 
     this.deploy = function deploy(deployment) {
-        deployment.deploy([this.proxy, this.elastic, this.logstash, this.postgres, this.mysql, this.kib]);
+        deployment.deploy([this.proxy, this.elastic, this.logstash, this.postgres, this.mysql, this.kib, this.kib1, this.kib2, this.kib3]);
         for (i = 0; i < this.instance_number; i++) {
             deployment.deploy(this.app[i]);
         }
