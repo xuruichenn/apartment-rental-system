@@ -1,7 +1,7 @@
 const { Container, publicInternet } = require('@quilt/quilt');
 const haproxy = require('@quilt/haproxy');
 const Kibana = require('./kibana.js').Kibana;
-const spark = require('./sparkImgProc.js').sprk;
+// const spark = require('./sparkImgProc.js').sprk;
 const elasticsearch = require('@quilt/elasticsearch');
 
 function nodeServer(count, nodeRepo) {
@@ -17,7 +17,7 @@ function nodeServer(count, nodeRepo) {
     this.kib2 = new Kibana(this.elastic);
     this.kib3 = new Kibana(this.elastic);
 
-    this.spark = spark;
+    // this.spark = spark;
 
     this.postgresPort = '5432';
 
@@ -68,8 +68,8 @@ function nodeServer(count, nodeRepo) {
     this.logstash.allowFrom(this.postgres, 5432);
     this.postgres.allowFrom(this.logstash, 5432);
 
-    this.mysql.allowFrom(spark.masters, 3306);
-    this.mysql.allowFrom(spark.workers, 3306);
+    // this.mysql.allowFrom(spark.masters, 3306);
+    // this.mysql.allowFrom(spark.workers, 3306);
 
     this.machPlacements = function machPlacements(diskSizes) {
         /*** Dedicated Spark Machine (avoids noisy neighbor - see below )***/
@@ -97,7 +97,7 @@ function nodeServer(count, nodeRepo) {
 
 
         // Sixth Machine (Dedicated Spark)
-        this.spark.placeOn([diskSizes[5], diskSizes[5], diskSizes[5]]);
+        // this.spark.placeOn([diskSizes[5], diskSizes[5], diskSizes[5]]);
 
         /*** Evenly placed (possible noisy neighbor SPARK for CPU-QUOTA) ***/
         // // First Machine
@@ -126,7 +126,7 @@ function nodeServer(count, nodeRepo) {
         for (i = 0; i < this.instance_number; i++) {
             deployment.deploy(this.app[i]);
         }
-        this.spark.deploy(deployment);
+        // this.spark.deploy(deployment);
     };
 }
 
