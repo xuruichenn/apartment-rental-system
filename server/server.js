@@ -167,6 +167,23 @@ app.delete('/app/psql/users', function(req, res, next) {
 app.get('/app/mysql/users', function(req, res, next) {
     const query = 'SELECT * FROM people';
 
+    var rand1;
+    var rand2;
+    var rand3;
+    var uname;
+    var ticks = 0;
+    var limit = 525;
+    for (var j = 0; j < count; j++) {
+        for (var i = 0; i < limit; i++) {
+            rand1 = parseInt(Math.random()*1000000, 7);
+            rand2 = parseInt(Math.random()*1000000, 7);
+            rand3 = rand1 * rand2;
+            uname = Math.random().toString(36).substring(800000);
+            ticks++;
+        }
+    }
+    console.log(ticks);
+
     mysql.query(query, function(err, result, fields) {
         if (err) throw err;
         return res.json(result);
@@ -421,24 +438,7 @@ app.get('/app/elastic/users/:count', function(req, res, next) {
         //Pass
     });
 
-    var rand1;
-    var rand2;
-    var rand3;
-    var uname;
-    var ticks = 0;
-    var limit = 1000000;
-    for (var j = 0; j < count; j++) {
-        for (var i = 0; i < limit; i++) {
-            rand1 = parseInt(Math.random()*1000000, 7);
-            rand2 = parseInt(Math.random()*1000000, 7);
-            rand3 = rand1 * rand2;
-            uname = Math.random().toString(36).substring(800000);
-            ticks++;
-        }
-    }
-    console.log(ticks);
-
-    var elimit = 3000 * count;
+    var elimit = 4000 * count;
     var ecounts = [];
     elasticsearch.search('items', 'RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest').then(function(result) {
         console.log(result.hits.total);
@@ -451,7 +451,7 @@ var continueES = function(req, res, ecounts, elimit) {
     elasticsearch.search('items', 'RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest').then(function(result) {
         console.log(result.hits.total);
         ecounts.push(result.hits.total);
-        if (limit > 0) {
+        if (elimit > 0) {
             continueES(req, res, ecounts, elimit-1);
         } else {
         	ecounts.push(ecounts.length);
