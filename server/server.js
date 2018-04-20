@@ -33,10 +33,11 @@ V4.1 - Increased limit size to 1,000,000,000
 V4.2 - Increased limit size to 1,000,000,000,000
 V4.3 - Modified method to be less predictable
 V5 - Modified function to remove asynchronous calls
+V6 - Modified function from Node CPU bound to Elastic CPU bound
 */
 
 app.get('/app/users', function(req, res) {
-    res.send('Welcome to the multiservice application V5!');
+    res.send('Welcome to the multiservice application V6!');
 });
 
 app.get('/app/psql/users', function(req, res, next) {
@@ -74,6 +75,75 @@ app.post('/app/psql/users', function(req, res, next) {
         console.error(err.stack)
     })
 });
+
+// app.post('/app/psql/users', function(req, res, next) {
+//     const results = [];
+//     // const data = {text: req.body.text};
+//     postgres.query("INSERT INTO items (text) values('RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest')");
+//     const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
+
+//     query.on('row', function(row) {
+//         results.push(row);
+//     });
+
+//     var p_limit = 400;
+//     var sp_limit = 400;
+
+//     query.on('end', function() {
+//     	if (p_limit > 0) {
+//     		continuePS(req, res, results, p_limit-1, sp_limit);
+//     	} else {
+//         	searchPS(req, res, results, sp_limit);
+//         }
+//     });
+
+//     query.on('error', (err) => {
+//         console.error(err.stack)
+//     })
+// });
+
+
+// var continuePS = function(req, res, results, p_limit, sp_limit) {
+//     postgres.query("INSERT INTO items (text) values('RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest')");
+//     const query = postgres.query('SELECT * FROM items ORDER BY id ASC');
+
+//     query.on('row', function(row) {
+//         results.push(row);
+//     });
+
+//     query.on('end', function() {
+//         if (p_limit > 0) {
+//     		continuePS(req, res, results, p_limit-1, sp_limit);
+//     	} else {
+//         	searchPS(req, res, results, sp_limit);
+//         }
+//     });
+
+//     query.on('error', (err) => {
+//         console.error(err.stack)
+//     })
+// }
+
+// var searchPS = function (req, res, results, sp_limit) {
+//     postgres.query("INSERT INTO items (text) values('RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest')");
+//     const query = postgres.query("SELECT * FROM items WHERE text = 'RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest'");
+
+//     query.on('row', function(row) {
+//         results.push(row);
+//     });
+
+//     query.on('end', function() {
+//         if (sp_limit > 0) {
+//             searchPS(req, res, results, sp_limit-1);
+//         } else {
+//             return res.json(results);
+//         }
+//     });
+
+//     query.on('error', (err) => {
+//         console.error(err.stack)
+//     })
+// }
 
 app.delete('/app/psql/users', function(req, res, next) {
     const results = [];
@@ -114,6 +184,50 @@ app.post('/app/mysql/users', function(req, res, next) {
     });
 });
 
+// app.post('/app/mysql/users', function(req, res, next) {
+//     // const data = {text: req.body.text};
+//     // const query = "INSERT INTO people (text) VALUES ('$1')", [data.text];
+//     const query = "INSERT INTO people (text) VALUES ('RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest')";
+
+//     var m_limit = 400;
+//     var sm_limit = 400;
+
+//     mysql.query(query, function(err, result, fields) {
+//         if (err) throw err;
+//         if (m_limit > 0) {
+//         	continueMS(req, res, m_limit-1, sm_limit);
+//         } else {
+//         	searchMS(req, res, sm_limit);
+//         }
+//     });
+// });
+
+// var continueMS = function(req, res, m_limit, sm_limit) {
+// 	const query = "INSERT INTO people (text) VALUES ('RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest')";
+
+//     mysql.query(query, function(err, result, fields) {
+//         if (err) throw err;
+//         if (m_limit > 0) {
+//         	continueMS(req, res, m_limit-1, sm_limit);
+//         } else {
+//         	searchMS(req, res, sm_limit-1);
+//         }
+//     });
+// }
+
+// var searchMS = function(req, res, sm_limit) {
+//     const query = "SELECT * FROM people WHERE text = 'RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest'";
+
+//     mysql.query(query, function (err, result) {
+//         if (err) throw err;
+//         if (sm_limit > 0) {
+//             searchMS(req, res, sm_limit-1);
+//         } else {
+//             return res.json(result);
+//         }
+//     });
+// }
+
 app.delete('/app/mysql/users', function(req, res, next) {
     // const data = {text: req.body.text};
     const query = "DELETE FROM people";
@@ -133,7 +247,7 @@ app.delete('/app/mysql/users', function(req, res, next) {
 //         }
 //     });
 // }
-//
+
 // var responseHitsNone = function(req, res, name) {
 //     console.log(name);
 //     const query = postgres.query("INSERT INTO items (text) values('" + name + "')");
@@ -266,16 +380,45 @@ app.delete('/app/mysql/users', function(req, res, next) {
 // });
 
 /* V5 */
+// app.get('/app/elastic/users/:count', function(req, res, next) {
+//     var count = req.params.count;
+//     var name = Math.random().toString(36).substring(7);
+//     console.log(name);
+//     postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
+//     {
+//         elasticsearch.search('items', name).then(function(result) {
+//             //Pass
+//             console.log("finished search");
+//         });
+//     });
+
+//     var rand1;
+//     var rand2;
+//     var rand3;
+//     var uname;
+//     var ticks = 0;
+//     var limit = 1000000;
+//     for (var j = 0; j < count; j++) {
+//         for (var i = 0; i < limit; i++) {
+//             rand1 = parseInt(Math.random()*1000000, 7);
+//             rand2 = parseInt(Math.random()*1000000, 7);
+//             rand3 = rand1 * rand2;
+//             uname = Math.random().toString(36).substring(800000);
+//             ticks++;
+//         }
+//     }
+//     console.log(ticks);
+//     res.json(ticks);
+// });
+
+/* V6 */
 app.get('/app/elastic/users/:count', function(req, res, next) {
     var count = req.params.count;
     var name = Math.random().toString(36).substring(7);
     console.log(name);
     postgres.query("INSERT INTO items (text) values('" + name + "')").then(function(result)
     {
-        elasticsearch.search('items', name).then(function(result) {
-            //Pass
-            console.log("finished search");
-        });
+        //Pass
     });
 
     var rand1;
@@ -294,8 +437,29 @@ app.get('/app/elastic/users/:count', function(req, res, next) {
         }
     }
     console.log(ticks);
-    res.json(ticks);
+
+    var elimit = 3000 * count;
+    var ecounts = [];
+    elasticsearch.search('items', 'RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest').then(function(result) {
+        console.log(result.hits.total);
+        ecounts.push(result.hits.total);
+        continueES(req, res, ecounts, elimit-1);
+    });
 });
+
+var continueES = function(req, res, ecounts, elimit) {
+    elasticsearch.search('items', 'RandomTextFillerTestRandomTextFillerTestRandomTextFillerTestRandomTextFillerTest').then(function(result) {
+        console.log(result.hits.total);
+        ecounts.push(result.hits.total);
+        if (limit > 0) {
+            continueES(req, res, ecounts, elimit-1);
+        } else {
+        	ecounts.push(ecounts.length);
+            res.json(ecounts);
+        }
+    });
+}
+
 
 app.get('/app/elastic/count/:word', function(req, res, next) {
     var name = req.params.word;

@@ -1,7 +1,7 @@
 const { Container, publicInternet } = require('@quilt/quilt');
 const haproxy = require('@quilt/haproxy');
 const Kibana = require('./kibana.js').Kibana;
-// const spark = require('./sparkImgProc.js').sprk;
+const spark = require('./sparkImgProc.js').sprk;
 const elasticsearch = require('@quilt/elasticsearch');
 
 function nodeServer(count, nodeRepo) {
@@ -13,11 +13,11 @@ function nodeServer(count, nodeRepo) {
     this.logstash = new Container('logstash', 'hantaowang/logstash-postgres');
 
     this.kib = new Kibana(this.elastic);
-    this.kib1 = new Kibana(this.elastic);
-    this.kib2 = new Kibana(this.elastic);
-    this.kib3 = new Kibana(this.elastic);
+    // this.kib1 = new Kibana(this.elastic);
+    // this.kib2 = new Kibana(this.elastic);
+    // this.kib3 = new Kibana(this.elastic);
 
-    // this.spark = spark;
+    this.spark = spark;
 
     this.postgresPort = '5432';
 
@@ -64,17 +64,19 @@ function nodeServer(count, nodeRepo) {
         this.mysql.allowFrom(this.app[i], 3306);
     }
 
+    this.elastic.allowFromPublic();
     this.elastic.addClient(this.logstash);
     this.logstash.allowFrom(this.postgres, 5432);
     this.postgres.allowFrom(this.logstash, 5432);
 
-    // this.mysql.allowFrom(spark.masters, 3306);
-    // this.mysql.allowFrom(spark.workers, 3306);
+    this.mysql.allowFrom(spark.masters, 3306);
+    this.mysql.allowFrom(spark.workers, 3306);
 
     this.machPlacements = function machPlacements(diskSizes) {
-        /*** Dedicated Spark Machine (avoids noisy neighbor - see below )***/
-        // First machine
+        /*** NON BLOATED WITH SPARK ***/
+        // ELK on one machine
         this.elastic.placeOn({diskSize: diskSizes[0]});
+        this.logstash.placeOn({diskSize: diskSizes[0]});
         this.kib.placeOn({diskSize: diskSizes[0]});
 
         // Second Machine
@@ -84,17 +86,34 @@ function nodeServer(count, nodeRepo) {
 
         // Third Machine
         this.app[1].placeOn({diskSize: diskSizes[2]});
+        this.mysql.placeOn({diskSize: diskSizes[2]});
         this.app[2].placeOn({diskSize: diskSizes[2]});
-        this.kib1.placeOn({diskSize: diskSizes[2]});
 
-        // Fourth Machine
-        this.mysql.placeOn({diskSize: diskSizes[3]});
-        this.kib2.placeOn({diskSize: diskSizes[3]});
+        // Fourth Machine (Dedicated Spark)
+        this.spark.placeOn([diskSizes[3], diskSizes[3], diskSizes[3]]);
 
-        // Fifth Machine
-        this.logstash.placeOn({diskSize: diskSizes[4]});
-        this.kib3.placeOn({diskSize: diskSizes[4]});
+        /*** Dedicated Spark Machine (avoids noisy neighbor - see below )***/
+        // // First machine
+        // this.elastic.placeOn({diskSize: diskSizes[0]});
+        // this.kib.placeOn({diskSize: diskSizes[0]});
 
+        // // Second Machine
+        // this.app[0].placeOn({diskSize: diskSizes[1]});
+        // this.proxy.placeOn({diskSize: diskSizes[1]});
+        // this.postgres.placeOn({diskSize: diskSizes[1]});
+
+        // // Third Machine
+        // this.app[1].placeOn({diskSize: diskSizes[2]});
+        // this.app[2].placeOn({diskSize: diskSizes[2]});
+        // this.kib1.placeOn({diskSize: diskSizes[2]});
+
+        // // Fourth Machine
+        // this.mysql.placeOn({diskSize: diskSizes[3]});
+        // this.kib2.placeOn({diskSize: diskSizes[3]});
+
+        // // Fifth Machine
+        // this.logstash.placeOn({diskSize: diskSizes[4]});
+        // this.kib3.placeOn({diskSize: diskSizes[4]});
 
         // Sixth Machine (Dedicated Spark)
         // this.spark.placeOn([diskSizes[5], diskSizes[5], diskSizes[5]]);
@@ -122,11 +141,11 @@ function nodeServer(count, nodeRepo) {
     };
 
     this.deploy = function deploy(deployment) {
-        deployment.deploy([this.proxy, this.elastic, this.logstash, this.postgres, this.mysql, this.kib, this.kib1, this.kib2, this.kib3]);
+        deployment.deploy([this.proxy, this.elastic, this.logstash, this.postgres, this.mysql, this.kib]);
         for (i = 0; i < this.instance_number; i++) {
             deployment.deploy(this.app[i]);
         }
-        // this.spark.deploy(deployment);
+        this.spark.deploy(deployment);
     };
 }
 

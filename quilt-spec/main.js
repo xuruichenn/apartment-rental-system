@@ -1,7 +1,7 @@
 const quilt = require('@quilt/quilt');
 const nodeServer = require('./nodeServer');
 
-const deployment = quilt.createDeployment({namespace: "TEMP", adminACL: ['0.0.0.0/0']});
+const deployment = quilt.createDeployment({namespace: "tsaianson-apt-app-exp", adminACL: ['0.0.0.0/0']});
 
 var machine0 = new quilt.Machine({
     provider: "Amazon",
@@ -46,24 +46,23 @@ var machine5 = new quilt.Machine({
 
 var machine6 = new quilt.Machine({
     provider: "Amazon",
-    size: "m4.large",
+    size: "m4.xlarge",
     sshKeys: quilt.githubKeys('TsaiAnson'),
     diskSize: 32,
 });
 
 var countNode = 3;
-const nodeRepository = 'tsaianson/node-apt-app';
+const nodeRepository = 'tsaianson/node-apt-app-2';
 const apartmentApp = new nodeServer(countNode, nodeRepository);
 
 deployment.deploy(machine0.asMaster());
 deployment.deploy(machine1.asWorker());
 deployment.deploy(machine2.asWorker());
 deployment.deploy(machine3.asWorker());
-deployment.deploy(machine4.asWorker());
-deployment.deploy(machine5.asWorker());
-// deployment.deploy(machine6.asWorker());
+// deployment.deploy(machine4.asWorker());
+// deployment.deploy(machine5.asWorker());
+deployment.deploy(machine6.asWorker());
 
-// Needs to be six machines! (Temporary)
-apartmentApp.machPlacements([15, 16, 17, 18, 19, 32]);
+apartmentApp.machPlacements([15, 16, 17, 32]);
 
 deployment.deploy(apartmentApp);
