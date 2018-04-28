@@ -68,17 +68,17 @@ function Spark(nMaster, nWorker, zookeeper) {
 
   // Flexible for workers on the same machine
   // WARNING: does not account for other service ports!
-  var count = 1;
-  for (; count < nWorker; count ++) {
-    allow(this.workers[count], publicInternet, 80 + count);
-    allow(this.workers[count], publicInternet, 53 + count);
-    allow(this.workers[count], publicInternet, 443 + count);
-    allow(this.workers[count], publicInternet, 5000 + count);
-    allow(publicInternet, this.workers[count], 80 + count);
-    allow(publicInternet, this.workers[count], 53 + count);
-    allow(publicInternet, this.workers[count], 443 + count);
-    allow(publicInternet, this.workers[count], 5000 + count);
-  }
+//   var count = 1;
+//   for (; count < nWorker; count ++) {
+//     allow(this.workers[count], publicInternet, 80 + count);
+//     allow(this.workers[count], publicInternet, 53 + count);
+//     allow(this.workers[count], publicInternet, 443 + count);
+//     allow(this.workers[count], publicInternet, 5000 + count);
+//     allow(publicInternet, this.workers[count], 80 + count);
+//     allow(publicInternet, this.workers[count], 53 + count);
+//     allow(publicInternet, this.workers[count], 443 + count);
+//     allow(publicInternet, this.workers[count], 5000 + count);
+//   }
 
   if (zookeeper) {
     allow(this.masters, zookeeper, 2181);
