@@ -8,7 +8,6 @@ function Kibana(es, port1) {
     ],
   });
   es.addClient(this.container);
-  this.container.allowFrom(publicInternet, port1);
 }
 
 Kibana.prototype.deploy = function deploy(depl) {
