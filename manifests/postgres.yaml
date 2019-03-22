@@ -32,10 +32,13 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: index.docker.io/postgres:11.2
+        image: index.docker.io/postgres:9.4
         ports:
         - containerPort: 5432
         env:
         - name: GET_HOSTS_FROM
           value: dns
-
+        - name: PGPASSWORD
+          value: 'runner'
+        - name: PGPORT
+          value: '5432'

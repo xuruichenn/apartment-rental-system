@@ -33,7 +33,7 @@ spec:
       containers:
       - name: haproxy
         imagePullPolicy: Always
-        image: index.docker.io/xuruichen/haproxy:latest
+        image: index.docker.io/xuruichen/apartmenthaproxy:latest
         ports:
         - containerPort: 80
           #name: haproxy

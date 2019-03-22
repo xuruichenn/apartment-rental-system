@@ -10,8 +10,8 @@ spec:
   selector:
     appName: kibana
   ports:
-  - port: 8080
-    targetPort: 8080
+  - port: 5601
+    targetPort: 5601
   type: ClusterIP
 ---
 #node deployment
@@ -34,7 +34,7 @@ spec:
       - name: kibana
         image: index.docker.io/kibana:6.6.1
         ports:
-        - containerPort: 8080
+        - containerPort: 5601
         env:
         - name: GET_HOSTS_FROM
           value: dns

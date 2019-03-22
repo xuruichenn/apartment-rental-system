@@ -24,7 +24,7 @@ spec:
   selector:
     matchLabels:
       appName: apartmentapp
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -38,4 +38,15 @@ spec:
         env:
         - name: GET_HOSTS_FROM
           value: dns
-
+        - name: 'mySQLHost'
+          value: 'mysql'
+        - name: 'elasticURL'
+          value: 'http://elasticsearch:9200'
+        - name: 'postgresURL'
+          value: 'postgresql://postgres:runner@postgres:5432/postgres'
+        - name: 'PW'
+          value: 'runner'
+        - name: 'HOST'
+          value: 'postgresql://postgres:runner@postgres'
+        - name: 'PORT'
+          value: '5432'

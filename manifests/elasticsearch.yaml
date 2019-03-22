@@ -10,8 +10,8 @@ spec:
   selector:
     appName: elasticsearch
   ports:
-  - port: 8080
-    targetPort: 8080
+  - port: 9200
+    targetPort: 9200
   type: ClusterIP
 ---
 #node deployment
@@ -34,7 +34,7 @@ spec:
       - name: elasticsearch
         image: index.docker.io/elasticsearch:2.4
         ports:
-        - containerPort: 8080
+        - containerPort: 9200
         env:
         - name: GET_HOSTS_FROM
           value: dns
